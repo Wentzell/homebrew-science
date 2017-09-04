@@ -1,15 +1,12 @@
 class Triqs < Formula
-  desc "Applications and Libraries for Physics Simulations"
+  desc "Toolbox for Research on Interacting Quantum Systems"
   homepage "https://triqs.ipht.cnrs.fr/"
-
+  url "https://github.com/TRIQS/triqs/archive/1.4.tar.gz"
+  sha256 "98378d5fb934c02f710d96eb5a3ffa28cbee20bab73b574487f5db18c5457cc4"
   head "https://github.com/TRIQS/triqs.git"
 
-  stable do
-    url "https://github.com/TRIQS/triqs/archive/1.4.tar.gz"
-    sha256 "98378d5fb934c02f710d96eb5a3ffa28cbee20bab73b574487f5db18c5457cc4"
-  end
-
-  option "with-test", "Build and run shipped tests"
+  # doi "10.1016/j.cpc.2015.04.023"
+  # tag "quantumphysics"
 
   depends_on "cmake" => :build
   depends_on :mpi => :cxx
@@ -36,18 +33,14 @@ class Triqs < Formula
       -DCMAKE_BUILD_TYPE=Release
       -DCMAKE_INSTALL_PREFIX=#{prefix}
     ]
-    args << ("-DBuild_Tests=" + (build.with?("test") ? "ON " : "OFF "))
 
     mkdir "build" do
-      rm("../test/triqs/statistics/autocorrelation_jackknife.cpp") if build.stable?
       system "cmake", *args
-      system "make", "-j", "1"
-      system "make", "test" if build.with? "test"
+      ENV.deparallelize { system "make" }
+      system "make", "test"
       system "make", "install"
     end
-  end
 
-  def post_install
     chmod 0555, bin/"clang_parser.py"
     chmod 0555, bin/"cpp2doc_tools.py"
   end
