@@ -253,8 +253,8 @@ class Triqs < Formula
     venv = virtualenv_create(libexec/"venv")
     venv.pip_install resources
 
-    python_version_major = %x(python -c 'import sys; print sys.version_info[0]').gsub("\n","")
-    python_version_minor = %x(python -c 'import sys; print sys.version_info[1]').gsub("\n","")
+    python_version_major = `python -c 'import sys; print sys.version_info[0]'`.delete("\n")
+    python_version_minor = `python -c 'import sys; print sys.version_info[1]'`.delete("\n")
     module_dir = "python#{python_version_major}.#{python_version_minor}/site-packages"
     ENV.prepend_path "PYTHONPATH", libexec + "venv/lib/" + module_dir
     ENV.prepend_path "PYTHONPATH", Formula["numpy"].opt_lib + module_dir
@@ -267,8 +267,6 @@ class Triqs < Formula
     ]
 
     mkdir "build" do
-      puts %x[echo $PYTHONPATH]
-      puts %x[which python]
       system "cmake", *args
       ENV.deparallelize { system "make" }
       system "make", "test"
